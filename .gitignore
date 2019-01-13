@@ -1,0 +1,17 @@
+Binaries
+DerivedDataCache
+Intermediate
+Saved
+.vscode
+.vs
+*.VC.db
+*.opensdf
+*.opendb
+*.sdf
+*.sln
+*.suo
+*.xcodeproj
+*.xcworkspace
+Content/Dynamic/Levels/*_BuiltData.uasset
+Content/Dynamic/Levels/*_BuiltData.uasset
+Content/PuzzleCPP/Maps/*_BuiltData.uasset
