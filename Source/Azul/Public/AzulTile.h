@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Tile/AzulTileType.h"
 #include "AzulTile.generated.h"
 
-
+class UTile;
+class UTileType;
 /** A block that can be clicked */
 UCLASS(minimalapi)
 class AAzulTile : public AActor
@@ -25,7 +25,6 @@ class AAzulTile : public AActor
 public:
 
 	AAzulTile();
-
 
 	/** Are we currently active? */
 	bool bIsActive;
@@ -58,17 +57,18 @@ public:
 
 	void Highlight(bool bOn);
 
-public:
 	/** Returns DummyRoot subobject **/
 	FORCEINLINE class USceneComponent* GetDummyRoot() const { return DummyRoot; }
 	/** Returns BlockMesh subobject **/
 	FORCEINLINE class UStaticMeshComponent* GetBlockMesh() const { return BlockMesh; }
 
-	AzulTileType::TileType GetTileType() const;
-	void SetTileType(AzulTileType::TileType TileType);
+	UTile* GetTile() const;
+	void SetTile(UTile* TileToSet);
+	UTileType* GetTileType() const;
 
 private:
-	AzulTileType::TileType Type;
+	UTile* Tile;
+
 };
 
 

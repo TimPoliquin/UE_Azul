@@ -1,7 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "AzulFactory.h"
-#include "Tile/AzulTileType.h"
 #include "AzulTile.h"
 
 // Sets default values
@@ -19,12 +18,18 @@ void AAzulFactory::BeginPlay()
 	
 }
 
-void AAzulFactory::AddTiles(TArray<AAzulTile*> TilesToAdd)
+void AAzulFactory::PopulateTiles(TArray<UTile*> TilesToAdd)
 {
-	Tiles.Append(TilesToAdd);
+	while (TilesToAdd.Num() > 0)
+	{
+		UTile* Tile = TilesToAdd.Pop();
+		AAzulTile* AzulTile = GetWorld()->SpawnActor<AAzulTile>(TileBlueprint);
+		AzulTile->SetTile(Tile);
+		AzulTile->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
+	}
 }
 
-TArray<AAzulTile*> AAzulFactory::PullTiles(AzulTileType::TileType TypeToPull)
+TArray<AAzulTile*> AAzulFactory::PullTiles(UTileType* TypeToPull)
 {
 	TArray<AAzulTile*> PulledTiles;
 	TArray<AAzulTile*> RemainingTiles;
@@ -42,4 +47,9 @@ TArray<AAzulTile*> AAzulFactory::PullTiles(AzulTileType::TileType TypeToPull)
 	Tiles.Empty();
 	// TODO - Send the remaining tiles to the Center
 	return PulledTiles;
+}
+
+void AAzulFactory::SetTileBlueprint(TSubclassOf<AAzulTile> TileBlueprintToSet)
+{
+	TileBlueprint = TileBlueprintToSet;
 }

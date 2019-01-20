@@ -6,7 +6,8 @@
 #include "Components/StaticMeshComponent.h"
 #include "Engine/StaticMesh.h"
 #include "Materials/MaterialInstance.h"
-#include "Tile/AzulTileType.h"
+#include "TileType.h"
+#include "Tile.h"
 
 AAzulTile::AAzulTile()
 {
@@ -94,12 +95,17 @@ void AAzulTile::Highlight(bool bOn)
 	}
 }
 
-AzulTileType::TileType AAzulTile::GetTileType() const
+UTile* AAzulTile::GetTile() const
 {
-	return Type;
+	return Tile;
 }
 
-void AAzulTile::SetTileType(AzulTileType::TileType TileType)
+void AAzulTile::SetTile(UTile* TileToSet)
 {
-	Type = TileType;
+	Tile = TileToSet;
+}
+
+UTileType* AAzulTile::GetTileType() const
+{
+	return Tile->GetTileType();
 }
