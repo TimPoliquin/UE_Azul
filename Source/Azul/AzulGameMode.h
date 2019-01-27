@@ -58,6 +58,7 @@ private:
 	void CreateTileType(FName Name, UMaterialInstance* MaterialInstance);
 	void CreateTiles();
 	void CreateFactories();
+	void ShuffleBag();
 };
 
 

@@ -29,22 +29,6 @@ public:
 	/** Are we currently active? */
 	bool bIsActive;
 
-	/** Pointer to white material used on the focused block */
-	UPROPERTY()
-	class UMaterial* BaseMaterial;
-
-	/** Pointer to blue material used on inactive blocks */
-	UPROPERTY()
-	class UMaterialInstance* BlueMaterial;
-
-	/** Pointer to orange material used on active blocks */
-	UPROPERTY()
-	class UMaterialInstance* OrangeMaterial;
-
-	/** Grid that owns us */
-	UPROPERTY()
-	class AAzulBlockGrid* OwningGrid;
-
 	/** Handle the block being clicked */
 	UFUNCTION()
 	void BlockClicked(UPrimitiveComponent* ClickedComp, FKey ButtonClicked);

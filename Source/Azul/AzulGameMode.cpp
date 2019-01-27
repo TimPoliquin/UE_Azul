@@ -6,6 +6,8 @@
 #include "Tile.h"
 #include "AzulFactory.h"
 #include "TileType.h"
+#include "UnrealMathUtility.h"
+
 
 AAzulGameMode::AAzulGameMode()
 {
@@ -58,7 +60,6 @@ void AAzulGameMode::CreateFactories()
 		float CurrentAngle = 2 * PI * FactoryNum / NumFactories;
 		float X = BoardRadius * FMath::Cos(CurrentAngle);
 		float Y = BoardRadius * FMath::Sin(CurrentAngle);
-		UE_LOG(LogTemp, Warning, TEXT("Positioning Factory at: %f, %f for angle %f"), X, Y, CurrentAngle)
 		FVector SpawnLocation(X, Y, 0);
 		AAzulFactory* Factory = GetWorld()->SpawnActor<AAzulFactory>(FactoryBlueprint, SpawnLocation, FRotator::ZeroRotator);
 		Factory->SetTileBlueprint(TileBlueprint);
@@ -81,6 +82,7 @@ void AAzulGameMode::StartRound()
 	{
 		Bag.Append(Box);
 		Box.Empty();
+		ShuffleBag();
 	}
 	TArray<UTile*> Tiles;
 	for(int32 FactoryIdx = 0; FactoryIdx < Factories.Num(); FactoryIdx++)
@@ -89,9 +91,19 @@ void AAzulGameMode::StartRound()
 		{
 			Tiles.Add(Bag.Pop());
 		}
-		UE_LOG(LogTemp, Warning, TEXT("NumTilesPerFactory: %d, NumTiles: %d"), NumTilesPerFactory, Tiles.Num())
 		AAzulFactory* Factory = Factories[FactoryIdx];
 		Factory->PopulateTiles(Tiles);
 		Tiles.Empty();
+	}
+}
+
+void AAzulGameMode::ShuffleBag()
+{
+	for (int32 Idx = Bag.Num() - 1; Idx > 0; Idx--)
+	{
+		int32 NewIdx = FMath::FloorToInt(FMath::SRand() * (Idx + 1)) % Bag.Num();
+		UTile* Temp = Bag[Idx];
+		Bag[Idx] = Bag[NewIdx];
+		Bag[NewIdx] = Temp;
 	}
 }

@@ -2,7 +2,6 @@
 
 #include "AzulPawn.h"
 #include "AzulTile.h"
-#include "HeadMountedDisplayFunctionLibrary.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "Engine/World.h"
