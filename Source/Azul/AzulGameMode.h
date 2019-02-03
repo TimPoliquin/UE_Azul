@@ -19,6 +19,9 @@ class AAzulGameMode : public AGameModeBase
 
 public:
 	AAzulGameMode();
+	void ReturnToBox(TArray<UTile*> TilesToReturn);
+	TArray<UTileType*> GetTileTypes() const;
+
 
 protected:
 	/* Properties */

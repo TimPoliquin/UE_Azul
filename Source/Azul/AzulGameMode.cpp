@@ -19,10 +19,10 @@ AAzulGameMode::AAzulGameMode()
 
 void AAzulGameMode::CreateTileTypes()
 {
+	CreateTileType(FName(TEXT("Blue")), BlueMaterialInstance);
+	CreateTileType(FName(TEXT("Orange")), OrangeMaterialInstance);
 	CreateTileType(FName(TEXT("Red")), RedMaterialInstance);
 	CreateTileType(FName(TEXT("Black")), BlackMaterialInstance);
-	CreateTileType(FName(TEXT("Orange")), OrangeMaterialInstance);
-	CreateTileType(FName(TEXT("Blue")), BlueMaterialInstance);
 	CreateTileType(FName(TEXT("White")), WhiteMaterialInstance);
 }
 
@@ -106,4 +106,14 @@ void AAzulGameMode::ShuffleBag()
 		Bag[Idx] = Bag[NewIdx];
 		Bag[NewIdx] = Temp;
 	}
+}
+
+void AAzulGameMode::ReturnToBox(TArray<UTile*> TilesToReturn)
+{
+	Box.Append(TilesToReturn);
+}
+
+TArray<UTileType*> AAzulGameMode::GetTileTypes() const
+{
+	return TileTypes;
 }
