@@ -11,6 +11,7 @@ class UTile;
 class UMaterialInstance;
 class AAzulFactory;
 class AAzulTile;
+class AGameBoard;
 /** GameMode class to specify pawn and playercontroller */
 UCLASS(minimalapi)
 class AAzulGameMode : public AGameModeBase
@@ -28,9 +29,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
 	uint32 NumPlayers = 2;
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
-	uint32 BoardRadius = 100;
-	UPROPERTY(EditDefaultsOnly, Category = "Setup")
-	TSubclassOf<AAzulFactory> FactoryBlueprint;
+	TSubclassOf<AGameBoard> GameBoardBlueprint;
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
 	TSubclassOf<AAzulTile> TileBlueprint;
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
@@ -51,16 +50,14 @@ protected:
 	void StartRound();
 
 private:
-	const int32 NumTilesPerFactory = 4;
 	TArray<UTileType*> TileTypes;
 	TArray<UTile*> Bag;
 	TArray<UTile*> Box;
-	TArray<AAzulFactory*> Factories;
-	int32 GetNumFactories() const;
+	AGameBoard* GameBoard;
 	void CreateTileTypes();
 	void CreateTileType(FName Name, UMaterialInstance* MaterialInstance);
 	void CreateTiles();
-	void CreateFactories();
+	void CreateGameBoard();
 	void ShuffleBag();
 };
 

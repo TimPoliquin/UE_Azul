@@ -5,7 +5,9 @@
 #include "AzulPawn.h"
 #include "Tile.h"
 #include "AzulFactory.h"
+#include "PlayerBoard.h"
 #include "TileType.h"
+#include "GameBoard.h"
 #include "UnrealMathUtility.h"
 
 
@@ -47,54 +49,24 @@ void AAzulGameMode::CreateTiles()
 	}
 }
 
-int32 AAzulGameMode::GetNumFactories() const
-{
-	return 5 + 2 * (NumPlayers - 2);
-}
-
-void AAzulGameMode::CreateFactories()
-{
-	const uint32 NumFactories = GetNumFactories();
-	for (uint32 FactoryNum = 0; FactoryNum < NumFactories; FactoryNum++)
-	{
-		float CurrentAngle = 2 * PI * FactoryNum / NumFactories;
-		float X = BoardRadius * FMath::Cos(CurrentAngle);
-		float Y = BoardRadius * FMath::Sin(CurrentAngle);
-		FVector SpawnLocation(X, Y, 0);
-		AAzulFactory* Factory = GetWorld()->SpawnActor<AAzulFactory>(FactoryBlueprint, SpawnLocation, FRotator::ZeroRotator);
-		Factory->SetTileBlueprint(TileBlueprint);
-		Factories.Add(Factory);
-	}
-}
-
 void AAzulGameMode::Initialize()
 {
 	CreateTileTypes();
 	CreateTiles();
-	CreateFactories();
+	CreateGameBoard();
 	StartRound();
 }
 
 void AAzulGameMode::StartRound()
 {
-	int32 NumTilesToPull = GetNumFactories() * 4;
+	int32 NumTilesToPull = GameBoard->GetNumFactories() * 4;
 	if (Bag.Num() < NumTilesToPull)
 	{
 		Bag.Append(Box);
 		Box.Empty();
 		ShuffleBag();
 	}
-	TArray<UTile*> Tiles;
-	for(int32 FactoryIdx = 0; FactoryIdx < Factories.Num(); FactoryIdx++)
-	{
-		for (int32 TileIdx = 0; TileIdx < NumTilesPerFactory; TileIdx++)
-		{
-			Tiles.Add(Bag.Pop());
-		}
-		AAzulFactory* Factory = Factories[FactoryIdx];
-		Factory->PopulateTiles(Tiles);
-		Tiles.Empty();
-	}
+	GameBoard->PopulateFactories(Bag);
 }
 
 void AAzulGameMode::ShuffleBag()
@@ -116,4 +88,10 @@ void AAzulGameMode::ReturnToBox(TArray<UTile*> TilesToReturn)
 TArray<UTileType*> AAzulGameMode::GetTileTypes() const
 {
 	return TileTypes;
+}
+
+void AAzulGameMode::CreateGameBoard()
+{
+	GameBoard = GetWorld()->SpawnActor<AGameBoard>(GameBoardBlueprint, FVector::ZeroVector, FRotator::ZeroRotator);
+	GameBoard->Initialize(NumPlayers);
 }

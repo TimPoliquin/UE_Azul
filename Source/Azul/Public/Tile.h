@@ -10,6 +10,7 @@
  * 
  */
 class UTileType;
+class AAzulTile;
 UCLASS()
 class AZUL_API UTile : public UObject
 {
@@ -20,6 +21,8 @@ public:
 	UTileType* GetTileType() const;
 	void SetTileType(UTileType* TileType);
 
+
 private:
 	UTileType* Type;
+	AAzulTile* RenderedTile;
 };
