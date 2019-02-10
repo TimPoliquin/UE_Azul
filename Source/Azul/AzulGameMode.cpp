@@ -6,6 +6,7 @@
 #include "Tile.h"
 #include "AzulFactory.h"
 #include "TileType.h"
+#include "Bag.h"
 #include "UnrealMathUtility.h"
 
 
@@ -15,6 +16,12 @@ AAzulGameMode::AAzulGameMode()
 	DefaultPawnClass = AAzulPawn::StaticClass();
 	// use our own player controller class
 	PlayerControllerClass = AAzulPlayerController::StaticClass();
+}
+
+void AAzulGameMode::CreateBag()
+{
+	Bag = NewObject<UBag>();
+	Bag->SetWorld(GetWorld());
 }
 
 void AAzulGameMode::CreateTileTypes()
@@ -41,7 +48,7 @@ void AAzulGameMode::CreateTiles()
 		for (uint32 TileNum = 0; TileNum < NumTilesPerType; TileNum++)
 		{
 			UTile* Tile = NewObject<UTile>();
-			Tile->SetTileType(TileType);
+			Tile->Initialize(TileBlueprint, TileType);
 			Box.Add(Tile);
 		}
 	}
@@ -62,13 +69,13 @@ void AAzulGameMode::CreateFactories()
 		float Y = BoardRadius * FMath::Sin(CurrentAngle);
 		FVector SpawnLocation(X, Y, 0);
 		AAzulFactory* Factory = GetWorld()->SpawnActor<AAzulFactory>(FactoryBlueprint, SpawnLocation, FRotator::ZeroRotator);
-		Factory->SetTileBlueprint(TileBlueprint);
 		Factories.Add(Factory);
 	}
 }
 
 void AAzulGameMode::Initialize()
 {
+	CreateBag();
 	CreateTileTypes();
 	CreateTiles();
 	CreateFactories();
@@ -78,33 +85,18 @@ void AAzulGameMode::Initialize()
 void AAzulGameMode::StartRound()
 {
 	int32 NumTilesToPull = GetNumFactories() * 4;
-	if (Bag.Num() < NumTilesToPull)
+	if (Bag->GetNumTilesRemaining() < NumTilesToPull)
 	{
-		Bag.Append(Box);
+		Bag->Return(Box);
 		Box.Empty();
-		ShuffleBag();
 	}
 	TArray<UTile*> Tiles;
 	for(int32 FactoryIdx = 0; FactoryIdx < Factories.Num(); FactoryIdx++)
 	{
-		for (int32 TileIdx = 0; TileIdx < NumTilesPerFactory; TileIdx++)
-		{
-			Tiles.Add(Bag.Pop());
-		}
+		TArray<AAzulTile*> TilesDrawn = Bag->Draw(NumTilesPerFactory);
 		AAzulFactory* Factory = Factories[FactoryIdx];
-		Factory->PopulateTiles(Tiles);
+		Factory->PopulateTiles(TilesDrawn);
 		Tiles.Empty();
-	}
-}
-
-void AAzulGameMode::ShuffleBag()
-{
-	for (int32 Idx = Bag.Num() - 1; Idx > 0; Idx--)
-	{
-		int32 NewIdx = FMath::FloorToInt(FMath::SRand() * (Idx + 1)) % Bag.Num();
-		UTile* Temp = Bag[Idx];
-		Bag[Idx] = Bag[NewIdx];
-		Bag[NewIdx] = Temp;
 	}
 }
 

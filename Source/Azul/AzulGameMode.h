@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "AzulGameMode.generated.h"
 
+class UBag;
 class UTileType;
 class UTile;
 class UMaterialInstance;
@@ -53,15 +54,15 @@ protected:
 private:
 	const int32 NumTilesPerFactory = 4;
 	TArray<UTileType*> TileTypes;
-	TArray<UTile*> Bag;
+	UBag* Bag;
 	TArray<UTile*> Box;
 	TArray<AAzulFactory*> Factories;
 	int32 GetNumFactories() const;
+	void CreateBag();
 	void CreateTileTypes();
 	void CreateTileType(FName Name, UMaterialInstance* MaterialInstance);
 	void CreateTiles();
 	void CreateFactories();
-	void ShuffleBag();
 };
 
 

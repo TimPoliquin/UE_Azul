@@ -7,18 +7,10 @@
 AAzulFactory::AAzulFactory()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
+	PrimaryActorTick.bCanEverTick = false;
 }
 
-// Called when the game starts or when spawned
-void AAzulFactory::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-void AAzulFactory::PopulateTiles(TArray<UTile*> TilesToAdd)
+void AAzulFactory::PopulateTiles(TArray<AAzulTile*> TilesToAdd)
 {
 	FVector FactoryOrigin;
 	FVector FactoryExtent;
@@ -35,15 +27,13 @@ void AAzulFactory::PopulateTiles(TArray<UTile*> TilesToAdd)
 	while (TilesToAdd.Num() > 0 && Locations.Num() > 0)
 	{
 		// Create Tile
-		UTile* Tile = TilesToAdd.Pop();
-		AAzulTile* AzulTile = GetWorld()->SpawnActor<AAzulTile>(TileBlueprint);
-		AzulTile->SetTile(Tile);
-		AzulTile->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
+		AAzulTile* Tile = TilesToAdd.Pop();
+		Tile->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
 		// Position Tile
 		FVector TileOrigin;
 		FVector TileExtent;
 		GetActorBounds(false, TileOrigin, TileExtent);
-		AzulTile->SetActorRelativeLocation(Locations.Pop());
+		Tile->SetActorRelativeLocation(Locations.Pop());
 	}
 }
 
@@ -65,9 +55,4 @@ TArray<AAzulTile*> AAzulFactory::PullTiles(UTileType* TypeToPull)
 	Tiles.Empty();
 	// TODO - Send the remaining tiles to the Center
 	return PulledTiles;
-}
-
-void AAzulFactory::SetTileBlueprint(TSubclassOf<AAzulTile> TileBlueprintToSet)
-{
-	TileBlueprint = TileBlueprintToSet;
 }

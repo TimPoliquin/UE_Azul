@@ -18,15 +18,9 @@ public:
 	// Sets default values for this actor's properties
 	AAzulFactory();
 
-	void PopulateTiles(TArray<UTile*> TilesToAdd);
+	void PopulateTiles(TArray<AAzulTile*> TilesToAdd);
 	TArray<AAzulTile*> PullTiles(UTileType* TypeToPull);
-	void SetTileBlueprint(TSubclassOf<AAzulTile> TileBlueprintToSet);
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
 
 private:
-	TSubclassOf<AAzulTile> TileBlueprint;
 	TArray<AAzulTile*> Tiles;
 };

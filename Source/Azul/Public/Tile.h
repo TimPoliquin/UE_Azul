@@ -9,17 +9,22 @@
 /**
  * 
  */
+class AAzulTile;
 class UTileType;
+class UWorld;
 UCLASS()
 class AZUL_API UTile : public UObject
 {
 	GENERATED_BODY()
 
 public:
-
+	void Initialize(TSubclassOf<AAzulTile> Blueprint, UTileType* TileType);
 	UTileType* GetTileType() const;
-	void SetTileType(UTileType* TileType);
+	AAzulTile* CreateActor(UWorld* World);
+	void DestroyActor();
 
 private:
+	TSubclassOf<AAzulTile> TileBlueprint;
 	UTileType* Type;
+	AAzulTile* Actor;
 };
