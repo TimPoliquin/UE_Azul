@@ -6,6 +6,9 @@
 #include "GameFramework/Actor.h"
 #include "AzulFactory.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FFactorySelectionStarted, AAzulFactory*, Factory);
+
+
 class UTileType;
 class UTile;
 class AAzulTile;
@@ -20,7 +23,16 @@ public:
 
 	void PopulateTiles(TArray<AAzulTile*> TilesToAdd);
 	TArray<AAzulTile*> PullTiles(UTileType* TypeToPull);
+	bool GetIsCenter() const;
+	void SetIsCenter(bool ToSet);
+	void ResetTileSelection();
+
+	FFactorySelectionStarted OnFactorySelectionStarted;
 
 private:
+	bool IsCenter = false;
 	TArray<AAzulTile*> Tiles;
+	
+	UFUNCTION() // To support delegate binding
+	void OnTileClicked(AAzulTile* ClickedTile);
 };

@@ -2,6 +2,7 @@
 
 #include "AzulFactory.h"
 #include "AzulTile.h"
+#include "TileType.h"
 
 // Sets default values
 AAzulFactory::AAzulFactory()
@@ -34,6 +35,8 @@ void AAzulFactory::PopulateTiles(TArray<AAzulTile*> TilesToAdd)
 		FVector TileExtent;
 		GetActorBounds(false, TileOrigin, TileExtent);
 		Tile->SetActorRelativeLocation(Locations.Pop());
+		Tile->OnTileClick.AddUniqueDynamic(this, &AAzulFactory::OnTileClicked);
+		Tiles.Add(Tile);
 	}
 }
 
@@ -46,6 +49,7 @@ TArray<AAzulTile*> AAzulFactory::PullTiles(UTileType* TypeToPull)
 		if (Tile->GetTileType() == TypeToPull)
 		{
 			PulledTiles.Add(Tile);
+			Tile->OnTileClick.RemoveDynamic(this, &AAzulFactory::OnTileClicked);
 		}
 		else
 		{
@@ -55,4 +59,45 @@ TArray<AAzulTile*> AAzulFactory::PullTiles(UTileType* TypeToPull)
 	Tiles.Empty();
 	// TODO - Send the remaining tiles to the Center
 	return PulledTiles;
+}
+
+void AAzulFactory::OnTileClicked(AAzulTile* ClickedTile)
+{
+	if (!ClickedTile)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Recieved a click event, but no tile was provided!"))
+		return;
+	}
+	UTileType* TileType = ClickedTile->GetTileType();
+	bool Highlight = !ClickedTile->GetIsSelected();
+	for (AAzulTile* Tile : Tiles)
+	{
+		if (Tile->GetTileType() == TileType)
+		{
+			Tile->Select(Highlight);
+		}
+		else
+		{
+			Tile->Select(false);
+		}
+	}
+	OnFactorySelectionStarted.Broadcast(this);
+}
+
+bool AAzulFactory::GetIsCenter() const
+{
+	return IsCenter;
+}
+
+void AAzulFactory::SetIsCenter(bool ToSet)
+{
+	IsCenter = ToSet;
+}
+
+void AAzulFactory::ResetTileSelection()
+{
+	for (AAzulTile* Tile : Tiles)
+	{
+		Tile->Select(false);
+	}
 }

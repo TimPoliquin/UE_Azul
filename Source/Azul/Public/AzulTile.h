@@ -6,6 +6,9 @@
 #include "GameFramework/Actor.h"
 #include "AzulTile.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTileClickDelegate, AAzulTile*, ClickedTile);
+
+
 class UTile;
 class UTileType;
 /** A block that can be clicked */
@@ -26,9 +29,6 @@ public:
 
 	AAzulTile();
 
-	/** Are we currently active? */
-	bool bIsActive;
-
 	/** Handle the block being clicked */
 	UFUNCTION()
 	void BlockClicked(UPrimitiveComponent* ClickedComp, FKey ButtonClicked);
@@ -36,10 +36,8 @@ public:
 	/** Handle the block being touched  */
 	UFUNCTION()
 	void OnFingerPressedBlock(ETouchIndex::Type FingerIndex, UPrimitiveComponent* TouchedComponent);
-
 	void HandleClicked();
-
-	void Highlight(bool bOn);
+	void Select(bool bOn);
 
 	/** Returns DummyRoot subobject **/
 	FORCEINLINE class USceneComponent* GetDummyRoot() const { return DummyRoot; }
@@ -50,8 +48,13 @@ public:
 	void SetTile(UTile* TileToSet);
 	UTileType* GetTileType() const;
 
+	bool GetIsSelected() const;
+
+	FTileClickDelegate OnTileClick;
+
 private:
 	UTile* Tile;
+	bool IsSelected;
 
 };
 

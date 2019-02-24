@@ -20,6 +20,7 @@ class AZUL_API UTile : public UObject
 public:
 	void Initialize(TSubclassOf<AAzulTile> Blueprint, UTileType* TileType);
 	UTileType* GetTileType() const;
+	AAzulTile* GetActor();
 	AAzulTile* CreateActor(UWorld* World);
 	void DestroyActor();
 

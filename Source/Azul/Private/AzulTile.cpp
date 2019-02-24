@@ -45,32 +45,26 @@ void AAzulTile::OnFingerPressedBlock(ETouchIndex::Type FingerIndex, UPrimitiveCo
 
 void AAzulTile::HandleClicked()
 {
-	// Check we are not already active
-	if (!bIsActive)
-	{
-		bIsActive = true;
-
-		// Change material
-		// BlockMesh->SetMaterial(0, OrangeMaterial);
-	}
+	OnTileClick.Broadcast(this);
 }
 
-void AAzulTile::Highlight(bool bOn)
+void AAzulTile::Select(bool bOn)
 {
-	// Do not highlight if the block has already been activated.
-	if (bIsActive)
+	FVector CurrentLocation = GetActorLocation();
+	if (bOn && !IsSelected)
 	{
-		return;
+		SetActorLocation(FVector(CurrentLocation.X, CurrentLocation.Y, CurrentLocation.Z + 50.f));
 	}
+	else if(!bOn && IsSelected)
+	{
+		SetActorLocation(FVector(CurrentLocation.X, CurrentLocation.Y, CurrentLocation.Z - 50.f));
+	}
+	IsSelected = bOn;
+}
 
-	if (bOn)
-	{
-		//BlockMesh->SetMaterial(0, BaseMaterial);
-	}
-	else
-	{
-		//BlockMesh->SetMaterial(0, BlueMaterial);
-	}
+bool AAzulTile::GetIsSelected() const
+{
+	return IsSelected;
 }
 
 UTile* AAzulTile::GetTile() const

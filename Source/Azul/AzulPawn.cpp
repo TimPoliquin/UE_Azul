@@ -61,6 +61,7 @@ void AAzulPawn::TraceForBlock(const FVector& Start, const FVector& End, bool bDr
 		AAzulTile* HitBlock = Cast<AAzulTile>(HitResult.Actor.Get());
 		if (CurrentBlockFocus != HitBlock)
 		{
+			/*
 			if (CurrentBlockFocus)
 			{
 				CurrentBlockFocus->Highlight(false);
@@ -69,12 +70,13 @@ void AAzulPawn::TraceForBlock(const FVector& Start, const FVector& End, bool bDr
 			{
 				HitBlock->Highlight(true);
 			}
+			*/
 			CurrentBlockFocus = HitBlock;
 		}
 	}
 	else if (CurrentBlockFocus)
 	{
-		CurrentBlockFocus->Highlight(false);
+		CurrentBlockFocus->Select(false);
 		CurrentBlockFocus = nullptr;
 	}
 }

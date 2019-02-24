@@ -33,6 +33,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
 	TSubclassOf<AAzulFactory> FactoryBlueprint;
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	TSubclassOf<AAzulFactory> CenterFactoryBlueprint;
+	UPROPERTY(EditDefaultsOnly, Category = "Setup")
 	TSubclassOf<AAzulTile> TileBlueprint;
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
 	UMaterialInstance* RedMaterialInstance;
@@ -44,6 +46,8 @@ protected:
 	UMaterialInstance* OrangeMaterialInstance;
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
 	UMaterialInstance* WhiteMaterialInstance;
+	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	UMaterialInstance* OneTileMaterialInstance;
 
 	/* Blueprint Callable Functions*/
 	UFUNCTION(BlueprintCallable, Category = "Setup")
@@ -57,12 +61,18 @@ private:
 	UBag* Bag;
 	TArray<UTile*> Box;
 	TArray<AAzulFactory*> Factories;
+	AAzulFactory* Center;
+	UTileType* OneTileType;
+	UTile* OneTile;
 	int32 GetNumFactories() const;
 	void CreateBag();
 	void CreateTileTypes();
-	void CreateTileType(FName Name, UMaterialInstance* MaterialInstance);
+	UTileType* CreateTileType(FName Name, UMaterialInstance* MaterialInstance);
 	void CreateTiles();
 	void CreateFactories();
+
+	UFUNCTION()
+	void OnFactorySelectionStarted(AAzulFactory* Factory);
 };
 
 

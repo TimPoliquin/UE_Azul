@@ -8,6 +8,7 @@
 #include "TileType.h"
 #include "Bag.h"
 #include "UnrealMathUtility.h"
+#include "AzulTile.h"
 
 
 AAzulGameMode::AAzulGameMode()
@@ -26,18 +27,21 @@ void AAzulGameMode::CreateBag()
 
 void AAzulGameMode::CreateTileTypes()
 {
-	CreateTileType(FName(TEXT("Blue")), BlueMaterialInstance);
-	CreateTileType(FName(TEXT("Orange")), OrangeMaterialInstance);
-	CreateTileType(FName(TEXT("Red")), RedMaterialInstance);
-	CreateTileType(FName(TEXT("Black")), BlackMaterialInstance);
-	CreateTileType(FName(TEXT("White")), WhiteMaterialInstance);
+	// Create tile types that have multiple tiles
+	TileTypes.Add(CreateTileType(FName(TEXT("Blue")), BlueMaterialInstance));
+	TileTypes.Add(CreateTileType(FName(TEXT("Orange")), OrangeMaterialInstance));
+	TileTypes.Add(CreateTileType(FName(TEXT("Red")), RedMaterialInstance));
+	TileTypes.Add(CreateTileType(FName(TEXT("Black")), BlackMaterialInstance));
+	TileTypes.Add(CreateTileType(FName(TEXT("White")), WhiteMaterialInstance));
+	// Create the OneTileType
+	OneTileType = CreateTileType(FName(TEXT("One")), OneTileMaterialInstance);
 }
 
-void AAzulGameMode::CreateTileType(FName Name, UMaterialInstance* MaterialInstance)
+UTileType* AAzulGameMode::CreateTileType(FName Name, UMaterialInstance* MaterialInstance)
 {
 	UTileType* TileType = NewObject<UTileType>();
 	TileType->Initialize(Name, MaterialInstance);
-	TileTypes.Add(TileType);
+	return TileType;
 }
 
 void AAzulGameMode::CreateTiles()
@@ -52,6 +56,8 @@ void AAzulGameMode::CreateTiles()
 			Box.Add(Tile);
 		}
 	}
+	OneTile = NewObject<UTile>();
+	OneTile->Initialize(TileBlueprint, OneTileType);
 }
 
 int32 AAzulGameMode::GetNumFactories() const
@@ -69,8 +75,12 @@ void AAzulGameMode::CreateFactories()
 		float Y = BoardRadius * FMath::Sin(CurrentAngle);
 		FVector SpawnLocation(X, Y, 0);
 		AAzulFactory* Factory = GetWorld()->SpawnActor<AAzulFactory>(FactoryBlueprint, SpawnLocation, FRotator::ZeroRotator);
+		Factory->OnFactorySelectionStarted.AddUniqueDynamic(this, &AAzulGameMode::OnFactorySelectionStarted);
 		Factories.Add(Factory);
 	}
+	Center = GetWorld()->SpawnActor<AAzulFactory>(CenterFactoryBlueprint, FVector::ZeroVector, FRotator::ZeroRotator);
+	Center->SetIsCenter(true);
+	Center->OnFactorySelectionStarted.AddUniqueDynamic(this, &AAzulGameMode::OnFactorySelectionStarted);
 }
 
 void AAzulGameMode::Initialize()
@@ -98,14 +108,41 @@ void AAzulGameMode::StartRound()
 		Factory->PopulateTiles(TilesDrawn);
 		Tiles.Empty();
 	}
+	// Get/Create the OneTile actor and move it to the center
+	if (!OneTile->GetActor())
+	{
+		OneTile->CreateActor(GetWorld());
+	}
+	TArray<AAzulTile*> OneTiles;
+	OneTiles.Add(OneTile->GetActor());
+	Center->PopulateTiles(OneTiles);
 }
 
 void AAzulGameMode::ReturnToBox(TArray<UTile*> TilesToReturn)
 {
 	Box.Append(TilesToReturn);
+	for (UTile* Tile : TilesToReturn)
+	{
+		Tile->DestroyActor();
+	}
 }
 
 TArray<UTileType*> AAzulGameMode::GetTileTypes() const
 {
 	return TileTypes;
+}
+
+void AAzulGameMode::OnFactorySelectionStarted(AAzulFactory* Factory)
+{
+	for (AAzulFactory* FactoryToReset : Factories)
+	{
+		if (FactoryToReset != Factory)
+		{
+			FactoryToReset->ResetTileSelection();
+		}
+	}
+	if (Factory != Center)
+	{
+		Center->ResetTileSelection();
+	}
 }

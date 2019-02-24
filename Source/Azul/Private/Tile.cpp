@@ -15,6 +15,11 @@ void UTile::Initialize(TSubclassOf<AAzulTile> Blueprint, UTileType* TileType)
 	Type = TileType;
 }
 
+AAzulTile* UTile::GetActor()
+{
+	return Actor;
+}
+
 AAzulTile* UTile::CreateActor(UWorld* World)
 {
 	if (!TileBlueprint)
@@ -22,8 +27,11 @@ AAzulTile* UTile::CreateActor(UWorld* World)
 		UE_LOG(LogTemp, Warning, TEXT("No tile blueprint set!"))
 		return nullptr;
 	}
-	Actor = World->SpawnActor<AAzulTile>(TileBlueprint, FVector::ZeroVector, FRotator::ZeroRotator);
-	Actor->SetTile(this);
+	if (!Actor)
+	{
+		Actor = World->SpawnActor<AAzulTile>(TileBlueprint, FVector::ZeroVector, FRotator::ZeroRotator);
+		Actor->SetTile(this);
+	}
 	return Actor;
 }
 
