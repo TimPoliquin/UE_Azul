@@ -12,6 +12,7 @@ class UTile;
 class UMaterialInstance;
 class AAzulFactory;
 class AAzulTile;
+class APlayerBoard;
 /** GameMode class to specify pawn and playercontroller */
 UCLASS(minimalapi)
 class AAzulGameMode : public AGameModeBase
@@ -26,27 +27,31 @@ public:
 
 protected:
 	/* Properties */
-	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	UPROPERTY(EditDefaultsOnly, Category = "Players")
 	uint32 NumPlayers = 2;
-	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	UPROPERTY(EditDefaultsOnly, Category = "Players")
+	FVector PlayerBoardPosition;
+	UPROPERTY(EditDefaultsOnly, Category = "Players")
+	TSubclassOf<APlayerBoard> PlayerBoardBlueprint;
+	UPROPERTY(EditDefaultsOnly, Category = "Factories")
 	uint32 BoardRadius = 100;
-	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	UPROPERTY(EditDefaultsOnly, Category = "Factories")
 	TSubclassOf<AAzulFactory> FactoryBlueprint;
-	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	UPROPERTY(EditDefaultsOnly, Category = "Factories")
 	TSubclassOf<AAzulFactory> CenterFactoryBlueprint;
-	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	UPROPERTY(EditDefaultsOnly, Category = "Tiles")
 	TSubclassOf<AAzulTile> TileBlueprint;
-	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	UPROPERTY(EditDefaultsOnly, Category = "Tiles")
 	UMaterialInstance* RedMaterialInstance;
-	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	UPROPERTY(EditDefaultsOnly, Category = "Tiles")
 	UMaterialInstance* BlueMaterialInstance;
-	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	UPROPERTY(EditDefaultsOnly, Category = "Tiles")
 	UMaterialInstance* BlackMaterialInstance;
-	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	UPROPERTY(EditDefaultsOnly, Category = "Tiles")
 	UMaterialInstance* OrangeMaterialInstance;
-	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	UPROPERTY(EditDefaultsOnly, Category = "Tiles")
 	UMaterialInstance* WhiteMaterialInstance;
-	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	UPROPERTY(EditDefaultsOnly, Category = "Tiles")
 	UMaterialInstance* OneTileMaterialInstance;
 
 	/* Blueprint Callable Functions*/
@@ -64,15 +69,24 @@ private:
 	AAzulFactory* Center;
 	UTileType* OneTileType;
 	UTile* OneTile;
+	TArray<APlayerBoard*> PlayerBoards;
 	int32 GetNumFactories() const;
+	AAzulFactory* FactoryWithSelection;
 	void CreateBag();
 	void CreateTileTypes();
 	UTileType* CreateTileType(FName Name, UMaterialInstance* MaterialInstance);
 	void CreateTiles();
 	void CreateFactories();
+	void CreatePlayerBoards();
 
 	UFUNCTION()
 	void OnFactorySelectionStarted(AAzulFactory* Factory);
+	UFUNCTION()
+	void OnFactorySelectionCancelled(AAzulFactory* Factory);
+	UFUNCTION()
+	void OnFactorySendTilesToCenter(TArray<AAzulTile*> TilesToSendToCenter);
+	UFUNCTION()
+	void OnPlayerBoardRowSelected(APlayerBoard* PlayerBoard, int32 SelectedRow);
 };
 
 

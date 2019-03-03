@@ -7,6 +7,8 @@
 #include "AzulFactory.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FFactorySelectionStarted, AAzulFactory*, Factory);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FFactorySelectionCancelled, AAzulFactory*, Factory);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FFactorySendTilesToCenter, const TArray<AAzulTile*>, Tiles);
 
 
 class UTileType;
@@ -22,17 +24,21 @@ public:
 	AAzulFactory();
 
 	void PopulateTiles(TArray<AAzulTile*> TilesToAdd);
-	TArray<AAzulTile*> PullTiles(UTileType* TypeToPull);
+	TArray<AAzulTile*> PullSelectedTiles();
 	bool GetIsCenter() const;
 	void SetIsCenter(bool ToSet);
 	void ResetTileSelection();
 
 	FFactorySelectionStarted OnFactorySelectionStarted;
+	FFactorySelectionCancelled OnFactorySelectionCancelled;
+	FFactorySendTilesToCenter OnFactorySendTilesToCenter;
 
 private:
 	bool IsCenter = false;
 	TArray<AAzulTile*> Tiles;
+	TArray<AAzulTile*> SelectedTiles;
 	
 	UFUNCTION() // To support delegate binding
 	void OnTileClicked(AAzulTile* ClickedTile);
+	void SelectTiles(UTileType* TileType);
 };

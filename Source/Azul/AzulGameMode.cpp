@@ -9,6 +9,7 @@
 #include "Bag.h"
 #include "UnrealMathUtility.h"
 #include "AzulTile.h"
+#include "PlayerBoard.h"
 
 
 AAzulGameMode::AAzulGameMode()
@@ -76,11 +77,14 @@ void AAzulGameMode::CreateFactories()
 		FVector SpawnLocation(X, Y, 0);
 		AAzulFactory* Factory = GetWorld()->SpawnActor<AAzulFactory>(FactoryBlueprint, SpawnLocation, FRotator::ZeroRotator);
 		Factory->OnFactorySelectionStarted.AddUniqueDynamic(this, &AAzulGameMode::OnFactorySelectionStarted);
+		Factory->OnFactorySelectionCancelled.AddUniqueDynamic(this, &AAzulGameMode::OnFactorySelectionCancelled);
+		Factory->OnFactorySendTilesToCenter.AddUniqueDynamic(this, &AAzulGameMode::OnFactorySendTilesToCenter);
 		Factories.Add(Factory);
 	}
 	Center = GetWorld()->SpawnActor<AAzulFactory>(CenterFactoryBlueprint, FVector::ZeroVector, FRotator::ZeroRotator);
 	Center->SetIsCenter(true);
 	Center->OnFactorySelectionStarted.AddUniqueDynamic(this, &AAzulGameMode::OnFactorySelectionStarted);
+	Center->OnFactorySelectionCancelled.AddUniqueDynamic(this, &AAzulGameMode::OnFactorySelectionCancelled);
 }
 
 void AAzulGameMode::Initialize()
@@ -89,6 +93,7 @@ void AAzulGameMode::Initialize()
 	CreateTileTypes();
 	CreateTiles();
 	CreateFactories();
+	CreatePlayerBoards();
 	StartRound();
 }
 
@@ -145,4 +150,41 @@ void AAzulGameMode::OnFactorySelectionStarted(AAzulFactory* Factory)
 	{
 		Center->ResetTileSelection();
 	}
+	FactoryWithSelection = Factory;
+}
+
+void AAzulGameMode::OnFactorySelectionCancelled(AAzulFactory* Factory)
+{
+	if (Factory == FactoryWithSelection)
+	{
+		FactoryWithSelection = nullptr;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Recieved selection cancelled for unselected factory"))
+	}
+}
+
+void AAzulGameMode::OnFactorySendTilesToCenter(TArray<AAzulTile*> TilesToSendToCenter)
+{
+	Center->PopulateTiles(TilesToSendToCenter);
+}
+
+void AAzulGameMode::CreatePlayerBoards()
+{
+	APlayerBoard* PlayerBoard = GetWorld()->SpawnActor<APlayerBoard>(PlayerBoardBlueprint, PlayerBoardPosition, FRotator::ZeroRotator);
+	PlayerBoard->OnPlayerBoardRowSelected.AddUniqueDynamic(this, &AAzulGameMode::OnPlayerBoardRowSelected);
+	PlayerBoards.Push(PlayerBoard);
+}
+
+void AAzulGameMode::OnPlayerBoardRowSelected(APlayerBoard* PlayerBoard, int32 SelectedRow)
+{
+	if (!FactoryWithSelection)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No factory selected -- aborting row selection"))
+		return;
+	}
+	TArray<AAzulTile*> PulledTiles = FactoryWithSelection->PullSelectedTiles();
+	PlayerBoard->AddTilesToLine(SelectedRow, PulledTiles);
+	FactoryWithSelection = nullptr;
 }
