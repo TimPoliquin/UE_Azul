@@ -37,6 +37,9 @@ public:
 
 	FPlayerBoardRowSelected OnPlayerBoardRowSelected;
 
+protected:
+	virtual void BeginPlay() override;
+
 private:
 	TArray<UPatternLine*> PatternLines;
 	TArray<UTile*> FloorLine;

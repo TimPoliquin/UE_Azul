@@ -5,10 +5,27 @@
 #include "AzulGameMode.h"
 #include "PatternLine.h"
 #include "AzulTile.h"
+#include "PlayerBoardTileSelector.h"
 
 // Sets default values
 APlayerBoard::APlayerBoard()
 {
+}
+
+void APlayerBoard::BeginPlay()
+{
+	Super::BeginPlay();
+	TArray<UActorComponent*> TileSelectors = GetComponentsByClass(UPlayerBoardTileSelector::StaticClass());
+	if (TileSelectors.Num() == 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Could not find Tile Selectors"));
+		return;
+	}
+	for (UActorComponent* Component : TileSelectors)
+	{
+		UPlayerBoardTileSelector* TileSelector = Cast<UPlayerBoardTileSelector>(Component);
+		TileSelector->OnPlayerBoardTileSelected.AddUniqueDynamic(this, &APlayerBoard::HandleRowClicked);
+	}
 }
 
 bool APlayerBoard::CanAddTilesToLine(int32 LineNum, UTileType* TileType)
@@ -22,13 +39,13 @@ void APlayerBoard::AddTilesToLine(int32 LineNum, TArray<AAzulTile*> Tiles)
 {
 	// Add Tiles to line
 	UStaticMeshComponent* PlayerBoard = Cast<UStaticMeshComponent>(GetDefaultSubobjectByName(FName("PlayerBoard")));
-	TArray<UActorComponent*> Rows = GetComponentsByTag(UStaticMeshComponent::StaticClass(), FName("Row"));
+	TArray<UActorComponent*> Rows = GetComponentsByTag(USceneComponent::StaticClass(), FName("Row"));
 	if (Rows.Num() == 0)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Could not find row component"));
 		return;
 	}
-	UStaticMeshComponent* Row = Cast<UStaticMeshComponent>(Rows[LineNum - 1]);
+	USceneComponent* Row = Cast<USceneComponent>(Rows[LineNum - 1]);
 	for (int32 TileNum = 0; TileNum < LineNum && Tiles.Num() > 0; TileNum++)
 	{
 		AAzulTile* Tile = Tiles.Pop();
