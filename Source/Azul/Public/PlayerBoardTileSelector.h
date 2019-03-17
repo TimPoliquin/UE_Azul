@@ -24,9 +24,9 @@ protected:
 
 	virtual void BeginPlay() override;
 
-	UPROPERTY(BlueprintReadWrite, Category="Setup")
+	UPROPERTY(EditInstanceOnly, Category="Setup")
 	int32 Row;
-	UPROPERTY(BlueprintReadWrite, Category = "Setup")
+	UPROPERTY(EditInstanceOnly, Category = "Setup")
 	int32 Column;
 
 private:
